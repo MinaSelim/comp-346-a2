@@ -11,30 +11,34 @@
  */
 class BlockStack
 {
-	/**
-	 * # of letters in the English alphabet + 2
-	 */
+	
 	public static final int MAX_SIZE = 28;
 
-	/**
-	 * Default stack size
-	 */
 	public static final int DEFAULT_SIZE = 6;
 
-	/**
-	 * Current size of the stack
-	 */
 	public int iSize = DEFAULT_SIZE;
 
-	/**
-	 * Current top of the stack
-	 */
 	public int iTop  = 3;
 
 	/**
 	 * stack[0:5] with four defined values
 	 */
-	public char acStack[] = new char[] {'a', 'b', 'c', 'd', '$', '$'};
+	public char acStack[] = new char[] {'a', 'b', 'c', 'd', '*', '*'};
+	
+	private int accessCounter = 0;
+
+	public int getAccessCounter() {
+		return accessCounter;
+	}
+
+	public void setAccessCounter(int stackAccessCounter) {
+		this.accessCounter = stackAccessCounter;
+	}
+	
+	public void incrementStackAccessCounter()
+	{
+		accessCounter++;
+	}
 
 	/**
 	 * Default constructor
@@ -59,7 +63,7 @@ class BlockStack
 			for(int i = 0; i < piSize - 2; i++)
 				this.acStack[i] = (char)('a' + i);
 
-			this.acStack[piSize - 2] = this.acStack[piSize - 1] = '$';
+			this.acStack[piSize - 2] = this.acStack[piSize - 1] = '*';
 
 			this.iTop = piSize - 3;
                         this.iSize = piSize;
@@ -72,6 +76,7 @@ class BlockStack
 	 */
 	public char pick()
 	{
+		incrementStackAccessCounter();
 		return this.acStack[this.iTop];
 	}
 
@@ -81,27 +86,26 @@ class BlockStack
 	 */
 	public char getAt(final int piPosition)
 	{
+		incrementStackAccessCounter();
 		return this.acStack[piPosition];
 	}
-
-	/**
-	 * Standard push operation
-	 */
+	
 	public void push(final char pcBlock)
 	{
+		incrementStackAccessCounter();
 		this.acStack[++this.iTop] = pcBlock;
+		System.out.println("Successful Push");
 	}
 
-	/**
-	 * Standard pop operation
-	 * @return ex-top element of the stack, char
-	 */
+
 	public char pop()
 	{
+		incrementStackAccessCounter();
 		char cBlock = this.acStack[this.iTop];
-		this.acStack[this.iTop--] = '$'; // Leave prev. value undefined
+		this.acStack[this.iTop--] = '*'; // Leave prev. value undefined
+		System.out.println("Successful Pop");
 		return cBlock;
-	}
+	}	
 }
 
 // EOF
