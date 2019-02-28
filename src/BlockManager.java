@@ -1,5 +1,6 @@
 // Import (aka include) some stuff.
-import common.*;
+import common.BaseThread;
+import common.Semaphore;
 
 /**
  * Class BlockManager
@@ -41,7 +42,8 @@ public class BlockManager
 	/**
 	 * s1 is to make sure phase I for all is done before any phase II begins
 	 */
-	//private static Semaphore s1 = new Semaphore(...);
+	private static Semaphore s1 = new Semaphore(-9);
+	private static boolean isPhaseOneComplete = false;
 
 	/**
 	 * s2 is for use in conjunction with Thread.turnTestAndSet() for phase II proceed
@@ -158,6 +160,7 @@ public class BlockManager
 
 
 			phase1();
+			s1.V();
 
 
 			try
@@ -196,7 +199,14 @@ public class BlockManager
 			{
 				mutex.V();
 			}
-
+			
+			s1.P();
+			if(isPhaseOneComplete == false)
+			{
+				System.out.println("PHASE I COMPLETE");
+				isPhaseOneComplete = true;
+			}
+			s1.V();
 			phase2();
 
 
@@ -220,7 +230,9 @@ public class BlockManager
 			System.out.println("ReleaseBlock thread [TID=" + this.iTID + "] starts executing.");
 
 
+			
 			phase1();
+			s1.V();
 
 
 			try
@@ -267,6 +279,13 @@ public class BlockManager
 				mutex.V();
 			}
 
+			s1.P();
+			if(isPhaseOneComplete == false)
+			{
+				System.out.println("PHASE I COMPLETE");
+				isPhaseOneComplete = true;
+			}
+			s1.V();
 
 			phase2();
 
@@ -284,6 +303,7 @@ public class BlockManager
 		public void run()
 		{
 			phase1();
+			s1.V();
 
 
 			try
@@ -314,7 +334,13 @@ public class BlockManager
 				System.exit(1);
 			}
 
-
+			s1.P();
+			if(isPhaseOneComplete == false)
+			{
+				System.out.println("PHASE I COMPLETE");
+				isPhaseOneComplete = true;
+			}
+			s1.V();
 			phase2();
 
 		}
