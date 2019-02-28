@@ -186,6 +186,7 @@ public class BlockManager
 			}
 			catch(Exception e)
 			{
+				System.out.println(e.getMessage());
 				reportException(e);
 				System.exit(1);
 			}
@@ -227,8 +228,15 @@ public class BlockManager
 					"ReleaseBlock thread [TID=" + this.iTID + "] returns Ms block " + this.cBlock +
 					" to position " + (soStack.getTop() + 1) + "."
 				);
-
-				soStack.push(this.cBlock);
+				
+				try
+				{
+					soStack.push(this.cBlock);
+				}
+				catch(Exception e)
+				{
+					System.out.println(e.getMessage());
+				}
 
 				System.out.println
 				(

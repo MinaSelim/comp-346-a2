@@ -1,3 +1,7 @@
+import common.Semaphore;
+import exceptions.EmptyStackException;
+import exceptions.FullStackException;
+
 /**
  * Class BlockStack
  * Implements character block stack and operations upon it.
@@ -16,15 +20,34 @@ class BlockStack
 
 	public static final int DEFAULT_SIZE = 6;
 
-	public int iSize = DEFAULT_SIZE;
+	private int iSize = DEFAULT_SIZE;
 
-	public int iTop  = 3;
+	private int iTop  = 3;
 
 	/**
 	 * stack[0:5] with four defined values
 	 */
-	public char acStack[] = new char[] {'a', 'b', 'c', 'd', '*', '*'};
+	private char acStack[] = new char[] {'a', 'b', 'c', 'd', '*', '*'};
 	
+	private Semaphore stackMutex = new Semaphore(1);
+	
+	public int getSize() {
+		return iSize;
+	}
+
+	public void setSize(int iSize) {
+		this.iSize = iSize;
+	}
+
+	public int getTop() {
+		return iTop;
+	}
+
+	public void setTop(int iTop) {
+		this.iTop = iTop;
+	}
+
+
 	private int accessCounter = 0;
 
 	public int getAccessCounter() {
@@ -90,9 +113,12 @@ class BlockStack
 		return this.acStack[piPosition];
 	}
 	
-	public void push(final char pcBlock)
+	public void push(char pcBlock)
 	{
 		incrementStackAccessCounter();
+		validateFullStack();
+		if(iTop == -1)
+			pcBlock = 'a';
 		this.acStack[++this.iTop] = pcBlock;
 		System.out.println("Successful Push");
 	}
@@ -101,11 +127,29 @@ class BlockStack
 	public char pop()
 	{
 		incrementStackAccessCounter();
+		validateEmptyStack();
 		char cBlock = this.acStack[this.iTop];
 		this.acStack[this.iTop--] = '*'; // Leave prev. value undefined
 		System.out.println("Successful Pop");
 		return cBlock;
 	}	
+	
+	public boolean isEmpty()
+	{
+		return this.iTop == -1;
+	}
+	
+	private void validateEmptyStack()
+	{
+		if(iTop==-1)
+			throw new EmptyStackException();
+	}
+	
+	private void validateFullStack()
+	{
+		if(iTop == acStack.length - 1)
+			throw new FullStackException();
+	}
 }
 
 // EOF
