@@ -32,7 +32,7 @@ public class BlockManager
 	/**
 	 * For atomicity
 	 */
-	//private static Semaphore mutex = new Semaphore(...);
+	private static Semaphore mutex = new Semaphore(1);
 
 	/*
 	 * For synchronization
@@ -114,13 +114,14 @@ public class BlockManager
 
 			for(int i = 0; i < NUM_PROBERS; i++)
 				aStackProbers[i].join();
-
+			mutex.P();
 			// Some final stats after all the child threads terminated...
 			System.out.println("System terminates normally.");
 			System.out.println("Final value of top = " + soStack.getTop() + ".");
 			System.out.println("Final value of stack top = " + soStack.pick() + ".");
 			System.out.println("Final value of stack top-1 = " + soStack.getAt(soStack.getTop() - 1) + ".");
 			System.out.println("Stack access count = " + soStack.getAccessCounter());
+			mutex.V();
 
 			System.exit(0);
 		}
@@ -163,6 +164,7 @@ public class BlockManager
 			{
 				System.out.println("AcquireBlock thread [TID=" + this.iTID + "] requests Ms block.");
 
+				mutex.P();
 				this.cCopy = soStack.pop();
 
 				System.out.println
@@ -189,6 +191,10 @@ public class BlockManager
 				System.out.println(e.getMessage());
 				reportException(e);
 				System.exit(1);
+			}
+			finally
+			{
+				mutex.V();
 			}
 
 			phase2();
@@ -219,9 +225,9 @@ public class BlockManager
 
 			try
 			{
+				mutex.P();
 				if(soStack.isEmpty() == false)
 					this.cBlock = (char)(soStack.pick() + 1);
-
 
 				System.out.println
 				(
@@ -232,6 +238,7 @@ public class BlockManager
 				try
 				{
 					soStack.push(this.cBlock);
+					
 				}
 				catch(Exception e)
 				{
@@ -254,6 +261,10 @@ public class BlockManager
 			{
 				reportException(e);
 				System.exit(1);
+			}
+			finally
+			{
+				mutex.V();
 			}
 
 
@@ -283,6 +294,7 @@ public class BlockManager
 
 					// [s] - means ordinay slot of a stack
 					// (s) - current top of the stack
+					mutex.P();
 					for(int s = 0; s < soStack.getSize(); s++)
 						System.out.print
 						(
@@ -290,6 +302,7 @@ public class BlockManager
 							BlockManager.soStack.getAt(s) +
 							(s == BlockManager.soStack.getTop() ? ")" : "]")
 						);
+					mutex.V();
 
 					System.out.println(".");
 

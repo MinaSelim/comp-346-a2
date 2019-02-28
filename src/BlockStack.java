@@ -29,7 +29,6 @@ class BlockStack
 	 */
 	private char acStack[] = new char[] {'a', 'b', 'c', 'd', '*', '*'};
 	
-	private Semaphore stackMutex = new Semaphore(1);
 	
 	public int getSize() {
 		return iSize;
