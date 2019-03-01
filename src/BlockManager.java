@@ -49,7 +49,7 @@ public class BlockManager
 	 * s2 is for use in conjunction with Thread.turnTestAndSet() for phase II proceed
 	 * in the thread creation order
 	 */
-	//private static Semaphore s2 = new Semaphore(...);
+	private static Semaphore s2 = new Semaphore(1);
 
 
 	// The main()
@@ -207,7 +207,21 @@ public class BlockManager
 				isPhaseOneComplete = true;
 			}
 			s1.V();
+			
+			s2.P();
+			while(!turnTestAndSet())
+			{
+				s2.V();
+				System.out.println("Thread " + this.iTID + " Failed to start.");
+				yield();
+				s2.P();
+				
+			}
+
 			phase2();
+			if(this.iTID == 10)
+				System.out.println("PHASE II COMPLETE");
+			s2.V();
 
 
 			System.out.println("AcquireBlock thread [TID=" + this.iTID + "] terminates.");
@@ -286,9 +300,23 @@ public class BlockManager
 				isPhaseOneComplete = true;
 			}
 			s1.V();
+			
+			 
+			s2.P();
+			while(!turnTestAndSet())
+			{
+				s2.V();
+				System.out.println("Thread " + this.iTID + " Failed to start.");
+				yield();
+				s2.P();
+				
+			}
+			
 
 			phase2();
-
+			if(this.iTID == 10)
+				System.out.println("PHASE II COMPLETE");
+			s2.V();
 
 			System.out.println("ReleaseBlock thread [TID=" + this.iTID + "] terminates.");
 		}
@@ -341,7 +369,21 @@ public class BlockManager
 				isPhaseOneComplete = true;
 			}
 			s1.V();
+			
+			s2.P();
+			while(!turnTestAndSet())
+			{
+				s2.V();
+				System.out.println("Thread " + this.iTID + " Failed to start.");
+				yield();
+				s2.P();
+				
+			}
 			phase2();
+			if(this.iTID == 10)
+				System.out.println("PHASE II COMPLETE");
+			s2.V();
+			
 
 		}
 	} // class CharStackProber
